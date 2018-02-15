@@ -58,7 +58,7 @@ summary(lm(acc~shannon,data=dat2))
 
 
 dat3<-dat%>%
-  filter(!is.na(acc)==T,Community=="Saline")
+  filter(!is.na(acc)==T,Community=="Brackish")
 dat3v<-dat3[,8:437]
 dat3v2<-dat3v[,which(colSums(dat3v>0)>2)]
 m1<-capscale(dat3v2~acc+Condition(Community),distance="bray",data=dat3)#,na.action=na.omit
@@ -75,11 +75,21 @@ sort(scores(m1,display="species")[,1])
 Sparalte      Vignlute      Schoamer      Coloescu      Altephil 
 Polypunc      Sagilati      Schodelt      Lythline      Sagiplat
 Sagilanc Sparpate  Phraaust
-ggplot(dat3,aes(x=Sparpate,y=acc,color=Community,group=Community))+
+ggplot(dat,aes(x=Schoamer,y=acc,color=Community,group=Community))+
   geom_point() +
   geom_line(stat="smooth",method = "lm",size=.8) +
   facet_wrap(~Community,scale="free") 
 
+dat2<-dat%>%filter(Community=="Brackish")#,Juncroem>0
+summary(lm(acc~Schoamer,data=dat2))
+
+#saline:
+Juncus roem has a negative effect
+Spartina alt is not sig but has a positive trend
+
+#brackish
+Spartina alt has positive
+Schoenoplectus ame has positive effect
 
 
 ###### merge the accretion/veg data with the salinity data #####

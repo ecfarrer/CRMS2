@@ -140,11 +140,11 @@ acc5[which(acc5$accmmpery<(-330)),]
 #merging accretion with veg data          
 #first define community type by most common type in stationfront
 #then average species comp and div and species rich
-#then merge accretion data with plant community data (veg4)
+#then merge accretion data with plant community data (veg5 ***used to be veg4)
 
-veg5<-veg4%>%
-  mutate(StationFront=StationID)%>%
-  separate(StationFront,into=c("StationFront","StationBack"),sep="_")
+#veg5<-veg4%>%
+#  mutate(StationFront=StationID)%>%
+#  separate(StationFront,into=c("StationFront","StationBack"),sep="_")
 
 #Define the community-type in each StationFront based on n of Commuity-type Counts per station:
 StationComm <- group_by(veg5,StationFront,Community) %>% 
@@ -161,7 +161,7 @@ StationCommDefined #320 stationFronts
 veg6<-veg5%>%
   left_join(StationCommDefined,by="StationFront")%>%
   group_by(StationFront,Community.y,year)%>%
-  select(-Community2007)%>%
+  #select(-Community2007)%>%
   summarise_at(vars(CoverTotal:tot),mean,na.rm=T)%>%
   left_join(acc5,by=c("StationFront","year"="syear"))
 
@@ -172,7 +172,7 @@ as.data.frame(veg6)[1:15,]
 #veg5[which(veg5$StationFront=="CRMS0002"&veg5$year==2007),"shannon"]
 #CRMS0002 in 2007 .7427 
 
-#I'm gtting the same pattern as Jankowski that fresh and saline ahve highest rates of accretion, inter/brack lower rates. However, my numbers here are much higher than theirs (theirs frsh 12.2, mine frsh 20.6)
+#I'm gtting the same pattern as Jankowski that fresh and saline have highest rates of accretion, inter/brack lower rates. However, my numbers here are much higher than theirs (theirs frsh 12.2, mine frsh 20.6)
 veg6%>%
   group_by(Community.y,year)%>%
   summarise(meandiv=mean(shannon),meancovertotal=mean(CoverTotal),meanacc=mean(meanaccmmpery,na.rm=T),seacc=std.error(meanaccmmpery,na.rm=T))
