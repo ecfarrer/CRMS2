@@ -11,12 +11,17 @@ library(chron)
 library(vegan)
 
 #gethub: https://github.com/PWaryszak/CRMS
+#         https://github.com/ecfarrer/CRMS2
+#Files on Box: https://account.box.com/login
+#         Farrerlab@wave.tulane.edu, Microbes345
+#         CRMS/Data/
 #Pawel files: https://sites.google.com/site/phragmitesproject/file-cabinet
-#CRMS raw data filse: https://cims.coastal.louisiana.gov/fulltableexports.aspx
+#CRMS raw data files: https://cims.coastal.louisiana.gov/fulltableexports.aspx
 
-save.image("/Users/farrer/Dropbox/EmilyComputerBackup/Documents/CoastalMarsh/CRMS/Figures&Stats/CRMS.Rdata")  
+save.image("/Users/farrer/Dropbox/EmilyComputerBackup/Documents/CoastalMarsh/CRMS/Figures&Stats/CRMS2/CRMS2.Rdata")  
 
-load("/Users/farrer/Dropbox/EmilyComputerBackup/Documents/CoastalMarsh/CRMS/Figures&Stats/CRMS.Rdata")
+#This takes ~5 min to load
+load("/Users/farrer/Dropbox/EmilyComputerBackup/Documents/CoastalMarsh/CRMS/Figures&Stats/CRMS2/CRMS2.Rdata")
 
 
 ##### Accretion and veg data at the StationFront level ######
@@ -58,30 +63,37 @@ summary(lm(acc~shannon,data=dat2))
 
 
 dat3<-dat%>%
-  filter(!is.na(acc)==T,Community=="Brackish")
+  filter(!is.na(acc)==T,Community=="Intermediate")
 dat3v<-dat3[,8:437]
 dat3v2<-dat3v[,which(colSums(dat3v>0)>2)]
-m1<-capscale(dat3v2~acc+Condition(Community),distance="bray",data=dat3)#,na.action=na.omit
+#m1<-capscale(dat3v2~acc+Condition(Community),distance="bray",data=dat3)#,na.action=na.omit
 m1<-capscale(dat3v2~acc,distance="bray",data=dat3)#,na.action=na.omit
 summary(m1)
 plot(m1,display=c("cn","species"))
-plot(m1,type="n",display="sp",xlim=c(-4,4))
+#plot(m1,type="n",display="sp",xlim=c(-4,4))
 plot(1:10,1:10,type="n",xlim=c(-1,2),ylim=c(-5,5))
 text(scores(m1)$species,row.names(scores(m1)$species))
 anova(m1)
 
 sort(scores(m1,display="species")[,1])
 
+Species to look at:
 Sparalte      Vignlute      Schoamer      Coloescu      Altephil 
-Polypunc      Sagilati      Schodelt      Lythline      Sagiplat
-Sagilanc Sparpate  Phraaust
-ggplot(dat,aes(x=Schoamer,y=acc,color=Community,group=Community))+
+Polypunc      Sagilati            Lythline
+Sagilanc Sparpate  Phraaust Panihemi
+
+ggplot(dat,aes(x=Sagilanc,y=acc,color=Community,group=Community))+
   geom_point() +
   geom_line(stat="smooth",method = "lm",size=.8) +
   facet_wrap(~Community,scale="free") 
 
-dat2<-dat%>%filter(Community=="Brackish")#,Juncroem>0
-summary(lm(acc~Schoamer,data=dat2))
+#stats on single community types
+dat2<-dat%>%filter(Community=="Intermediate")#,Juncroem>0
+summary(lm(acc~Sagilanc,data=dat2))
+
+#stats with all community types
+options(contrasts=c("contr.helmert","contr.poly")) 
+anova(gls(acc~Sagilanc+Community+Sagilanc*Community,na.action=na.omit,data=dat),type="marginal")
 
 #saline:
 Juncus roem has a negative effect
@@ -91,15 +103,31 @@ Spartina alt is not sig but has a positive trend
 Spartina alt has positive
 Schoenoplectus ame has positive effect
 
+#intermediate
+Sparpate neg effect
+Schocali neg effect
+Vignlute pos effect
+Schoamer pos effect
+Sagilanc pos effect but not very convincing
+
+#fresh
+Sagilanc has negative trend p=.1
+Colocasia has sig positive effect but not very convincing
+
+
+
+
+
 
 ###### merge the accretion/veg data with the salinity data #####
 #env6 (from SalinityECF.R)
+# this graph is not as pretty as the other one (in the Gulf proposal), however we might want to use this b/c we can use path analysis (i.e. for path analysis the data all have to be on the same samples/at the same scale)
 
 dat2<-dat%>%
   left_join(env6,by=c("StationFront"))%>%
   select(StationFront:acc,MeanSalinity,MaxSalinity,Acerrubr:ZiziMill)
 dim(dat2)
-as.data.frame(dat2[1:15,1:15])
+as.data.frame(dat2)[1:15,1:15]
 dat2$MeanSalinity
 dat2$acc
 
@@ -111,6 +139,23 @@ ggplot(dat2,aes(x=MeanSalinity,y=shannon,color=Community))+
   geom_line(stat="smooth",method = "lm",size=.8)+
   facet_wrap(~Community,scale="free")
 dev.off()
+
+#Regression plots with species vs salinity
+ggplot(dat2,aes(x=MeanSalinity,y=Sparpate,color=Community))+
+  labs(x = "Salinity (ppt)",y="Species cover",colour="Community type")+
+  geom_point()+
+  geom_line(stat="smooth",method = "lm",size=.8)+
+  facet_wrap(~Community,scale="free")
+
+ggplot(dat2,aes(x=MeanSalinity,y=Sparpate))+
+  labs(x = "Salinity (ppt)",y="Species cover",colour="Community type")+
+  geom_point(aes(color=Community))+
+  geom_smooth(se = FALSE, method = "gam", formula = y ~ s(x^2))
+  
+
+
+
+
 
 
 #env7 (from code below including veg porewater and P plots)

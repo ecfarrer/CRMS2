@@ -83,6 +83,7 @@ acc2a[which(acc2a$acc>100),]
 
 
 ##### Calculating yearly accretion rates for each plot #####
+# I'm not sure if this is valid b/c there is probably considerable error in each yearly measurement, so the above regression smooths over that error, while here calculating yearly rates that error is shown. so right now, I am not using the below, and going with the plot level analyses above
 
 #need to check that the number of unique(Station>ID) is equal to the number of places where sample and establishment dates are the same
 length(unique(acc2$Station.ID)) #5108 unique stations
@@ -128,11 +129,11 @@ acc5<-acc4%>%
 as.data.frame(acc5)[1:20,]
 
 #checking
-hist(acc5$accmmpery)
-sort(acc5$accmmpery)
-min(acc5$accmmpery)
-acc5[which(acc5$accmmpery==min(acc5$accmmpery)),]
-acc5[which(acc5$accmmpery<(-330)),]
+hist(acc5$meanaccmmpery)
+sort(acc5$meanaccmmpery)
+min(acc5$meanaccmmpery)
+acc5[which(acc5$meanaccmmpery==min(acc5$meanaccmmpery)),]
+acc5[which(acc5$meanaccmmpery<(-330)),]
 
 #up above delete things that look odd: CRMS0392-A05 in 2009
 

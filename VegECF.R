@@ -11,6 +11,7 @@ library(vegan)
 
 ##### Raw veg data #####
 #5 => 75 percent cover; 4 = 50-75 percent cover; 3 = 25-50 percent cover; 2 = 5-25 percent cover; 1 = numerous, but less than 5 percent cover, or scattered, with cover up to 5 percent; + = few, with small cover; and r = rare, solitary, with small cover.
+#the CRMS_Marsh_Veg.csv file I got from Pawel (he emailed it to me), he said it was an "old" version of the version he was using b/c it still had cover values in it. I'm not entirely sure what he did to clean or subset the data, howver this file is smaller than the raw data file downloaded directly from the CRMS website. So eventually, we might want to check in with Pawel (or look at his code?) and see what he did
 veg <- read.csv("CRMS_Marsh_Veg.csv")
 levels(veg$Community)#"Brackish" "Freshwater" "Intermediate" "Saline"
 veg$Community<-factor(veg$Community, levels = c( "Freshwater","Intermediate","Brackish","Saline"))
